@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TRIBEv2 Analyzer</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #0b0b0f;
+      color: #f5f5f7;
+      padding: 32px;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .card {
+      background: #15151c;
+      border: 1px solid #272733;
+      border-radius: 18px;
+      padding: 24px;
+      margin-bottom: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.25);
+    }
+    h1 {
+      margin: 0 0 8px;
+      font-size: 32px;
+    }
+    p {
+      color: #b9bcc6;
+      line-height: 1.5;
+    }
+    .row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    button {
+      background: #ff8a00;
+      color: #111;
+      border: 0;
+      padding: 14px 18px;
+      border-radius: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    button:disabled {
+      opacity: .6;
+      cursor: not-allowed;
+    }
+    input[type="file"] {
+      background: #101018;
+      color: #fff;
+      border: 1px solid #2c2c38;
+      border-radius: 12px;
+      padding: 12px;
+      width: 100%;
+    }
+    .status {
+      display: inline-block;
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+    .ok { background: rgba(0, 180, 90, .15); color: #65d695; }
+    .warn { background: rgba(255, 170, 0, .15); color: #ffbf47; }
+    .error { background: rgba(255, 70, 70, .15); color: #ff8b8b; }
+    pre {
+      background: #0f1117;
+      border: 1px solid #242938;
+      color: #d8e1f0;
+      padding: 16px;
+      border-radius: 14px;
+      overflow: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .small {
+      font-size: 14px;
+      color: #9ea3b0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <h1>TRIBEv2 Analyzer</h1>
+      <p>Carregue o modelo, envie um vídeo e visualize o resumo da análise direto no navegador.</p>
+    </div>
+
+    <div class="card">
+      <h2>Status do Modelo</h2>
+      <div class="row" style="margin-bottom: 12px;">
+        <button id="checkStatusBtn">Atualizar status</button>
+        <button id="loadModelBtn">Carregar modelo</button>
+      </div>
+      <div id="modelStatus" class="status warn">Verificando...</div>
+      <p class="small" id="modelInfo"></p>
+    </div>
+
+    <div class="card">
+      <h2>Analisar vídeo</h2>
+      <div style="margin-bottom: 12px;">
+        <input type="file" id="videoFile" accept=".mp4,.mov,.avi,.mkv,.webm" />
+      </div>
+      <div class="row">
+        <button id="analyzeBtn">Enviar vídeo e analisar</button>
+      </div>
+      <p class="small">Formatos suportados: mp4, mov, avi, mkv, webm.</p>
+    </div>
+
+    <div class="card">
+      <h2>Resultado</h2>
+      <pre id="resultBox">Nenhuma análise executada ainda.</pre>
+    </div>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
