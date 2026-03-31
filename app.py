@@ -41,16 +41,12 @@ def ensure_required_dirs() -> None:
 def to_serializable(value):
     if value is None:
         return None
-
     if isinstance(value, (str, int, float, bool, dict, list)):
         return value
-
     if hasattr(value, "tolist"):
         return value.tolist()
-
     if isinstance(value, tuple):
         return [to_serializable(v) for v in value]
-
     return str(value)
 
 
@@ -61,7 +57,11 @@ def startup_checks():
 
 @app.get("/", response_class=HTMLResponse)
 def home(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
+    return templates.TemplateResponse(
+        request=request,
+        name="index.html",
+        context={}
+    )
 
 
 @app.get("/api/status")
