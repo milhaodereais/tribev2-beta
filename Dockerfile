@@ -2,7 +2,8 @@ FROM python:3.11-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    PIP_NO_CACHE_DIR=1
+    PIP_NO_CACHE_DIR=1 \
+    PATH="/root/.local/bin:$PATH"
 
 WORKDIR /app
 
@@ -14,10 +15,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-# 🔥 instala uv (e uvx)
-RUN curl -Ls https://astral.sh/uv/install.sh | sh
-
-ENV PATH="/root/.local/bin:$PATH"
+# instala uv / uvx
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh
 
 COPY . /app
 
