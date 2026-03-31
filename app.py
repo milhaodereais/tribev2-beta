@@ -1,4 +1,7 @@
-from fastapi import FastAPI, UploadFile, File, HTTPException
+from fastapi import FastAPI, UploadFile, File, HTTPException, Request
+from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 from pathlib import Path
 import shutil
 import tempfile
@@ -12,15 +15,21 @@ model = None
 MODEL_NAME = "facebook/tribev2"
 CACHE_DIR = "./cache"
 UPLOAD_DIR = Path("./uploads")
+
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+Path("./templates").mkdir(parents=True, exist_ok=True)
+Path("./static").mkdir(parents=True, exist_ok=True)
+
+app.mount("/static", StaticFiles(directory="static"), name="static")
+templates = Jinja2Templates(directory="templates")
 
 
-@app.get("/")
-def root():
-    return {"status": "ok", "message": "TRIBEv2 API rodando no Coolify"}
+@app.get("/", response_class=HTMLResponse)
+def home(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
 
 
-@app.get("/status")
+@app.get("/api/status")
 def status():
     return {
         "status": "ok",
@@ -29,7 +38,7 @@ def status():
     }
 
 
-@app.post("/load-model")
+@app.post("/api/load-model")
 def load_model():
     global model
     try:
@@ -43,14 +52,14 @@ def load_model():
         raise HTTPException(status_code=500, detail=f"Erro ao carregar modelo: {e}")
 
 
-@app.post("/predict")
+@app.post("/api/predict")
 async def predict_video(file: UploadFile = File(...)):
     global model
 
     if model is None:
         raise HTTPException(
             status_code=400,
-            detail="Modelo não carregado. Chame /load-model antes."
+            detail="Modelo não carregado. Clique em 'Carregar Modelo' primeiro."
         )
 
     if not file.filename:
@@ -74,7 +83,6 @@ async def predict_video(file: UploadFile = File(...)):
         df = model.get_events_dataframe(video_path=str(temp_path))
         preds, segments = model.predict(events=df)
 
-        # resumo leve para JSON
         response = {
             "status": "ok",
             "filename": file.filename,
@@ -84,7 +92,6 @@ async def predict_video(file: UploadFile = File(...)):
             "segments_preview": segments[:5] if segments is not None else [],
         }
 
-        # estatísticas simples, sem retornar a matriz gigante inteira
         try:
             response["predictions_summary"] = {
                 "mean": float(preds.mean()),
@@ -95,7 +102,7 @@ async def predict_video(file: UploadFile = File(...)):
         except Exception:
             response["predictions_summary"] = "Não foi possível calcular resumo estatístico."
 
-        return response
+        return JSONResponse(content=response)
 
     except Exception as e:
         traceback.print_exc()
