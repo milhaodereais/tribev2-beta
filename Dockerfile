@@ -17,7 +17,7 @@ COPY . /app
 
 RUN python -m pip install --upgrade pip setuptools wheel
 RUN pip install -e .
-RUN pip install fastapi uvicorn python-multipart
+RUN pip install fastapi uvicorn python-multipart jinja2
 RUN python -m spacy download en_core_web_sm
 
 CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "3000"]
