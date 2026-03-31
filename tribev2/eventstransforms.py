@@ -7,7 +7,7 @@ import torch
 logger = logging.getLogger(__name__)
 
 
-class AudioToTranscriptTransform:
+class ExtractWordsFromAudio:
     language: str = "english"
     overwrite: bool = False
 
@@ -25,7 +25,6 @@ class AudioToTranscriptTransform:
         if language not in language_codes:
             raise ValueError(f"Language {language} not supported")
 
-        # 🔥 AJUSTE CRÍTICO AQUI
         device = "cuda" if torch.cuda.is_available() else "cpu"
         compute_type = "float16" if device == "cuda" else "int8"
         batch_size = "16" if device == "cuda" else "1"
@@ -51,18 +50,14 @@ class AudioToTranscriptTransform:
                 "--batch_size",
                 batch_size,
                 "--align_model",
-                "WAV2VEC2_ASR_LARGE_LV60K_960H"
-                if language == "english"
-                else "",
+                "WAV2VEC2_ASR_LARGE_LV60K_960H" if language == "english" else "",
                 "--output_dir",
                 output_dir,
                 "--output_format",
                 "json",
             ]
 
-            # remove argumentos vazios
             cmd = [c for c in cmd if c]
-
             env = {k: v for k, v in os.environ.items() if k != "MPLBACKEND"}
 
             result = subprocess.run(cmd, capture_output=True, text=True, env=env)
@@ -76,8 +71,7 @@ class AudioToTranscriptTransform:
         words = []
 
         for i, segment in enumerate(transcript["segments"]):
-            sentence = segment["text"]
-            sentence = sentence.replace('"', "")
+            sentence = segment["text"].replace('"', "")
 
             for word in segment["words"]:
                 if "start" not in word:
@@ -90,8 +84,6 @@ class AudioToTranscriptTransform:
                     "sequence_id": i,
                     "sentence": sentence,
                 }
-
                 words.append(word_dict)
 
-        transcript = pd.DataFrame(words)
-        return transcript
+        return pd.DataFrame(words)
