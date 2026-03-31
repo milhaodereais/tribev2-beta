@@ -11,7 +11,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ffmpeg \
     libsndfile1 \
     build-essential \
+    curl \
     && rm -rf /var/lib/apt/lists/*
+
+# 🔥 instala uv (e uvx)
+RUN curl -Ls https://astral.sh/uv/install.sh | sh
+
+ENV PATH="/root/.local/bin:$PATH"
 
 COPY . /app
 
